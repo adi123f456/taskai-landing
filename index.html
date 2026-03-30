@@ -573,22 +573,26 @@
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
   // Waitlist handler (replace with your actual Supabase/email API)
-  function joinWaitlist() {
+  async function joinWaitlist()
     const email = document.getElementById('email-input').value.trim();
     if (!email || !email.includes('@')) { document.getElementById('email-input').style.borderColor = '#F87171'; return; }
-    document.getElementById('wform').style.display = 'none';
-    document.getElementById('success-msg').style.display = 'block';
-    // TODO: POST to your Supabase waitlist table
-    console.log('Waitlist email:', email);
-  }
-
-  function joinWaitlist2() {
+   document.getElementById('wform').style.display = 'none';
+document.getElementById('success-msg').style.display = 'block';
+await fetch('https://formspree.io/f/xdapepen', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ email })
+});
+async function joinWaitlist2() {
     const email = document.getElementById('email-input2').value.trim();
     if (!email || !email.includes('@')) { document.getElementById('email-input2').style.borderColor = '#F87171'; return; }
     document.getElementById('wform2').style.display = 'none';
-    document.getElementById('success-msg2').style.display = 'block';
-    console.log('Waitlist email:', email);
-  }
+document.getElementById('success-msg2').style.display = 'block';
+await fetch('https://formspree.io/f/xdapepen', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ email })
+});
 
   // Enter key support
   document.getElementById('email-input').addEventListener('keydown', e => { if (e.key === 'Enter') joinWaitlist(); });
