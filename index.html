@@ -573,30 +573,47 @@
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
   // Waitlist handler (replace with your actual Supabase/email API)
-  async function joinWaitlist()
-    const email = document.getElementById('email-input').value.trim();
-    if (!email || !email.includes('@')) { document.getElementById('email-input').style.borderColor = '#F87171'; return; }
-   document.getElementById('wform').style.display = 'none';
-document.getElementById('success-msg').style.display = 'block';
-await fetch('https://formspree.io/f/xdapepen', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ email })
-});
-async function joinWaitlist2() {
-    const email = document.getElementById('email-input2').value.trim();
-    if (!email || !email.includes('@')) { document.getElementById('email-input2').style.borderColor = '#F87171'; return; }
-    document.getElementById('wform2').style.display = 'none';
-document.getElementById('success-msg2').style.display = 'block';
-await fetch('https://formspree.io/f/xdapepen', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ email })
-});
+ // Scroll reveal
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-  // Enter key support
-  document.getElementById('email-input').addEventListener('keydown', e => { if (e.key === 'Enter') joinWaitlist(); });
-  document.getElementById('email-input2').addEventListener('keydown', e => { if (e.key === 'Enter') joinWaitlist2(); });
+async function joinWaitlist() {
+  const email = document.getElementById('email-input').value.trim();
+  if (!email || !email.includes('@')) {
+    document.getElementById('email-input').style.borderColor = '#F87171';
+    return;
+  }
+  await fetch('https://formspree.io/f/xdapepen', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email })
+  });
+  document.getElementById('wform').style.display = 'none';
+  document.getElementById('success-msg').style.display = 'block';
+}
+
+async function joinWaitlist2() {
+  const email = document.getElementById('email-input2').value.trim();
+  if (!email || !email.includes('@')) {
+    document.getElementById('email-input2').style.borderColor = '#F87171';
+    return;
+  }
+  await fetch('https://formspree.io/f/xdapepen', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email })
+  });
+  document.getElementById('wform2').style.display = 'none';
+  document.getElementById('success-msg2').style.display = 'block';
+}
+
+document.getElementById('email-input').addEventListener('keydown', e => { if (e.key === 'Enter') joinWaitlist(); });
+document.getElementById('email-input2').addEventListener('keydown', e => { if (e.key === 'Enter') joinWaitlist2(); });
+
+
+  // Enter key support;
 </script>
 </body>
 </html>
