@@ -539,6 +539,67 @@
   </div>
 </section>
 
+<!-- LIVE DEMO -->
+<section class="section reveal" id="demo">
+  <div class="section-label">Live Demo</div>
+  <h2 class="section-title">Try it right now — for free</h2>
+  <p class="section-sub">Add your tasks below and watch AI prioritize them instantly.</p>
+
+  <div style="max-width:740px;margin:0 auto;">
+
+    <!-- Task Input -->
+    <div id="demo-input-area" style="background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px;margin-bottom:16px;">
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+        <input id="demo-task" placeholder="Task description... e.g. Design logo for Priya by Friday" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:14px;color:var(--text);font-family:inherit;outline:none;" onkeydown="if(event.key==='Enter')demoAddTask()"/>
+        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;">
+          <input id="demo-client" placeholder="Client name" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--text);font-family:inherit;outline:none;"/>
+          <input id="demo-deadline" type="date" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--text);font-family:inherit;outline:none;"/>
+          <select id="demo-effort" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--text);font-family:inherit;outline:none;">
+            <option value="low">🟢 Low</option>
+            <option value="medium" selected>🟡 Medium</option>
+            <option value="high">🔴 High</option>
+          </select>
+        </div>
+        <button onclick="demoAddTask()" style="background:rgba(124,106,245,0.15);color:var(--accent2);border:1px solid rgba(124,106,245,0.3);border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;align-self:flex-start;">+ Add Task</button>
+      </div>
+
+      <!-- Task List -->
+      <div id="demo-task-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;"></div>
+
+      <button id="demo-analyze-btn" onclick="demoAnalyze()" style="width:100%;background:linear-gradient(135deg,#7C6AF5,#C084FC);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;opacity:0.5;pointer-events:none;">
+        ⚡ Prioritize with AI
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div id="demo-loading" style="display:none;text-align:center;padding:40px;">
+      <div style="font-size:28px;animation:spin 1s linear infinite;display:inline-block;">⚡</div>
+      <div style="color:var(--muted);font-size:14px;margin-top:12px;">AI is analyzing your tasks...</div>
+    </div>
+
+    <!-- Results -->
+    <div id="demo-results" style="display:none;">
+      <!-- AI Insight -->
+      <div id="demo-insight" style="background:rgba(124,106,245,0.1);border:1px solid rgba(124,106,245,0.25);border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:13px;color:var(--accent2);display:flex;gap:10px;align-items:flex-start;">
+        <span>🤖</span><span id="demo-insight-text"></span>
+      </div>
+
+      <!-- Tabs -->
+      <div style="display:flex;gap:4px;background:var(--surface2);border-radius:10px;padding:4px;margin-bottom:16px;">
+        <button onclick="demoTab('priority')" id="tab-priority" style="flex:1;padding:8px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Priority Board</button>
+        <button onclick="demoTab('plan')" id="tab-plan" style="flex:1;padding:8px;border:none;border-radius:8px;background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Daily Plan</button>
+        <button onclick="demoTab('alerts')" id="tab-alerts" style="flex:1;padding:8px;border:none;border-radius:8px;background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Alerts</button>
+      </div>
+
+      <div id="demo-priority-tab"></div>
+      <div id="demo-plan-tab" style="display:none;"></div>
+      <div id="demo-alerts-tab" style="display:none;"></div>
+
+      <button onclick="demoReset()" style="width:100%;margin-top:12px;background:transparent;border:1px solid var(--border);border-radius:10px;padding:12px;font-size:13px;color:var(--muted);cursor:pointer;font-family:inherit;">← Try Again</button>
+    </div>
+  </div>
+</section>
+
 <!-- CTA -->
 <section class="cta-section reveal">
   <h2 class="cta-title">Your most productive day<br>starts here.</h2>
@@ -603,9 +664,152 @@
 
   document.getElementById('email-input').addEventListener('keydown', e => { if (e.key === 'Enter') joinWaitlist(); });
   document.getElementById('email-input2').addEventListener('keydown', e => { if (e.key === 'Enter') joinWaitlist2(); });
-</script>
-</body>
-</html>  // Enter key support;
+
+  // ── LIVE DEMO ──
+  let demoTasks = [];
+
+  function demoAddTask() {
+    const title = document.getElementById('demo-task').value.trim();
+    if (!title) return;
+    const client = document.getElementById('demo-client').value.trim();
+    const deadline = document.getElementById('demo-deadline').value;
+    const effort = document.getElementById('demo-effort').value;
+    demoTasks.push({ id: Date.now(), title, client, deadline, effort });
+    document.getElementById('demo-task').value = '';
+    document.getElementById('demo-client').value = '';
+    document.getElementById('demo-deadline').value = '';
+    document.getElementById('demo-effort').value = 'medium';
+    renderDemoTaskList();
+  }
+
+  function renderDemoTaskList() {
+    const list = document.getElementById('demo-task-list');
+    const btn = document.getElementById('demo-analyze-btn');
+    list.innerHTML = demoTasks.map((t, i) => `
+      <div style="display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;">
+        <span style="color:var(--accent);font-weight:700;font-size:12px;">${i+1}</span>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;color:var(--text);">${t.title}</div>
+          <div style="font-size:11px;color:var(--muted);">${t.client ? t.client+' · ' : ''}${t.deadline ? 'Due '+t.deadline+' · ' : ''}${t.effort} effort</div>
+        </div>
+        <button onclick="demoRemoveTask(${t.id})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;">×</button>
+      </div>`).join('');
+    if (demoTasks.length > 0) {
+      btn.style.opacity = '1'; btn.style.pointerEvents = 'auto';
+      btn.textContent = `⚡ Prioritize ${demoTasks.length} Task${demoTasks.length > 1 ? 's' : ''} with AI`;
+    } else {
+      btn.style.opacity = '0.5'; btn.style.pointerEvents = 'none';
+      btn.textContent = '⚡ Prioritize with AI';
+    }
+  }
+
+  function demoRemoveTask(id) {
+    demoTasks = demoTasks.filter(t => t.id !== id);
+    renderDemoTaskList();
+  }
+
+  async function demoAnalyze() {
+    if (demoTasks.length === 0) return;
+    document.getElementById('demo-input-area').style.display = 'none';
+    document.getElementById('demo-loading').style.display = 'block';
+
+    const taskText = demoTasks.map((t, i) =>
+      `${i+1}. "${t.title}" | Client: ${t.client || 'N/A'} | Deadline: ${t.deadline || 'none'} | Effort: ${t.effort}`
+    ).join('\n');
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: `You are TaskAI. Respond ONLY with valid JSON, no markdown:
+{"prioritized":[{"id":"1","title":"","client":"","deadline":"YYYY-MM-DD or null","effort":"low|medium|high","priority":1,"priorityLabel":"🔴 Critical|🟠 High|🟡 Medium|🟢 Low","reason":"short reason","category":"design|development|writing|calls|admin|other"}],"dailyPlan":[{"time":"9:00 AM","task":"","client":"","duration":"2h","tip":""}],"alerts":[{"type":"warning|danger|info","message":""}],"aiInsight":"one line insight"}`,
+          messages: [{ role: 'user', content: `Today is ${new Date().toDateString()}. Tasks:\n${taskText}\nPrioritize and return JSON only.` }]
+        })
+      });
+      const data = await res.json();
+      const raw = (data.content || []).map(b => b.text || '').join('').trim();
+      const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+      document.getElementById('demo-loading').style.display = 'none';
+      document.getElementById('demo-results').style.display = 'block';
+      renderDemoResults(parsed);
+    } catch(e) {
+      document.getElementById('demo-loading').innerHTML = '<div style="color:#F87171;text-align:center;padding:20px;">Something went wrong. Try again!</div>';
+    }
+  }
+
+  const PRIORITY_COLORS = {
+    '🔴 Critical': { bg:'rgba(239,68,68,0.1)', border:'rgba(239,68,68,0.3)', text:'#FCA5A5' },
+    '🟠 High':     { bg:'rgba(251,146,60,0.1)', border:'rgba(251,146,60,0.3)', text:'#FCD34D' },
+    '🟡 Medium':   { bg:'rgba(99,102,241,0.1)', border:'rgba(99,102,241,0.3)', text:'#A5B4FC' },
+    '🟢 Low':      { bg:'rgba(52,211,153,0.1)', border:'rgba(52,211,153,0.3)', text:'#6EE7B7' },
+  };
+
+  function renderDemoResults(data) {
+    document.getElementById('demo-insight-text').textContent = data.aiInsight || '';
+
+    // Priority tab
+    document.getElementById('demo-priority-tab').innerHTML = (data.prioritized || []).map(t => {
+      const c = PRIORITY_COLORS[t.priorityLabel] || PRIORITY_COLORS['🟢 Low'];
+      const days = t.deadline ? Math.ceil((new Date(t.deadline) - new Date()) / 86400000) : null;
+      return `<div style="border:1px solid ${c.border};border-radius:14px;padding:14px 16px;margin-bottom:10px;background:${c.bg};display:flex;gap:12px;align-items:flex-start;">
+        <span style="font-size:18px;font-weight:800;color:${c.text};min-width:24px;">#${t.priority}</span>
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span style="font-size:14px;font-weight:700;color:var(--text);">${t.title}</span>
+            <span style="font-size:10px;font-weight:700;color:${c.text};background:${c.bg};border:1px solid ${c.border};padding:2px 8px;border-radius:20px;">${t.priorityLabel}</span>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:4px;flex-wrap:wrap;font-size:11px;color:var(--muted);">
+            ${t.client ? `<span>👤 ${t.client}</span>` : ''}
+            ${t.deadline ? `<span style="color:${days !== null && days <= 2 ? '#F87171' : 'var(--muted)'}">📅 ${t.deadline} ${days !== null ? (days < 0 ? '(overdue!)' : days === 0 ? '(today!)' : `(${days}d left)`) : ''}</span>` : ''}
+            <span>● ${t.effort} effort</span>
+          </div>
+          ${t.reason ? `<div style="font-size:12px;color:var(--muted);margin-top:6px;">${t.reason}</div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+
+    // Daily plan tab
+    document.getElementById('demo-plan-tab').innerHTML = (data.dailyPlan || []).map(s => `
+      <div style="display:flex;gap:14px;margin-bottom:12px;">
+        <div style="min-width:70px;text-align:right;font-size:12px;font-weight:700;color:var(--accent);padding-top:10px;">${s.time}</div>
+        <div style="width:2px;background:var(--border);border-radius:2px;position:relative;flex-shrink:0;"><div style="width:8px;height:8px;border-radius:50%;background:var(--accent);position:absolute;top:10px;left:-3px;"></div></div>
+        <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-top:4px;">
+          <div style="font-size:13px;font-weight:700;color:var(--text);">${s.task}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px;">${s.client ? '👤 '+s.client+' · ' : ''}⏱ ${s.duration}</div>
+          ${s.tip ? `<div style="font-size:11px;color:var(--accent2);margin-top:6px;font-style:italic;">💡 ${s.tip}</div>` : ''}
+        </div>
+      </div>`).join('');
+
+    // Alerts tab
+    const alertStyles = { danger: {bg:'rgba(239,68,68,0.1)',border:'rgba(239,68,68,0.3)',text:'#FCA5A5',icon:'🚨'}, warning: {bg:'rgba(251,191,36,0.1)',border:'rgba(251,191,36,0.3)',text:'#FCD34D',icon:'⚠️'}, info: {bg:'rgba(99,102,241,0.1)',border:'rgba(99,102,241,0.3)',text:'#A5B4FC',icon:'ℹ️'} };
+    document.getElementById('demo-alerts-tab').innerHTML = (data.alerts || []).length === 0
+      ? '<div style="text-align:center;padding:24px;color:var(--muted);">✅ No alerts! You\'re on track.</div>'
+      : (data.alerts || []).map(a => { const s = alertStyles[a.type] || alertStyles.info; return `<div style="background:${s.bg};border:1px solid ${s.border};border-radius:12px;padding:12px 16px;margin-bottom:10px;display:flex;gap:10px;"><span>${s.icon}</span><span style="font-size:13px;color:${s.text};">${a.message}</span></div>`; }).join('');
+
+    // Update tab label with alert count
+    const alertCount = (data.alerts || []).length;
+    document.getElementById('tab-alerts').textContent = `Alerts${alertCount ? ' ('+alertCount+')' : ''}`;
+  }
+
+  function demoTab(tab) {
+    ['priority','plan','alerts'].forEach(t => {
+      document.getElementById('demo-'+t+'-tab').style.display = t === tab ? 'block' : 'none';
+      const btn = document.getElementById('tab-'+t);
+      btn.style.background = t === tab ? 'var(--accent)' : 'transparent';
+      btn.style.color = t === tab ? '#fff' : 'var(--muted)';
+    });
+  }
+
+  function demoReset() {
+    demoTasks = [];
+    document.getElementById('demo-input-area').style.display = 'block';
+    document.getElementById('demo-loading').style.display = 'none';
+    document.getElementById('demo-results').style.display = 'none';
+    renderDemoTaskList();
+  }
 </script>
 </body>
 </html>
